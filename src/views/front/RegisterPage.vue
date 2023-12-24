@@ -20,7 +20,7 @@
               <el-input class="login-input" v-model="login.login_repwd" type="password" autocomplete="off" />
             </el-form-item>
             <el-form-item>
-              <el-button @click="registerSubmit" class="login-btn">注册</el-button>
+              <el-button :loading="loading" @click="registerSubmit" class="login-btn">注册</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -47,6 +47,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       login: {
         login_name: "",
         login_pwd: "",
@@ -78,16 +79,21 @@ export default {
   },
   methods: {
     registerSubmit() {
-      console.log(this.login)
       this.$refs['login'].validate((valid) => {
+        this.loading = true;
         if (valid) {
           register(this.login).then(res => {
             console.log(res)
             this.$successMsg('注册成功')
+            this.loading = false;
+            // 跳转到登录页面
+            this.$router.push('/login')
           }).catch(err => {
             console.log(err)
+            this.loading = false;
           })
         } else {
+          this.loading = false;
           return false;
         }
       });
