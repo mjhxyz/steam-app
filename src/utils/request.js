@@ -29,7 +29,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
     response => {
         const res = response.data
-        if (res.code !== 20000) {
+        if (res.code !== 2000) {
             ElMessage({
                 message: res.msg || '出错了',
                 type: 'error',
@@ -49,7 +49,7 @@ service.interceptors.response.use(
             //         })
             //     })
             // }
-            return Promise.reject(new Error(res.message || 'Error'))
+            return Promise.reject(new Error(res.msg || '出错了'))
         } else {
             return res
         }

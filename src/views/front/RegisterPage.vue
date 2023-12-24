@@ -20,7 +20,7 @@
               <el-input class="login-input" v-model="login.login_repwd" type="password" autocomplete="off" />
             </el-form-item>
             <el-form-item>
-              <el-button @click="loginSubmit" class="login-btn">注册</el-button>
+              <el-button @click="registerSubmit" class="login-btn">注册</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -37,8 +37,8 @@
 </template>
  
 <script>
-import { ElNotification } from 'element-plus'
 import LoginNav from '@/components/LoginNav.vue'
+import { register } from '@/api/front/user.js'
 
 export default {
   name: "RegisterPage",
@@ -49,7 +49,8 @@ export default {
     return {
       login: {
         login_name: "",
-        login_pwd: ""
+        login_pwd: "",
+        login_repwd: ""
       },
       loginRule: {
         login_name: [
@@ -76,14 +77,15 @@ export default {
     };
   },
   methods: {
-    loginSubmit() {
+    registerSubmit() {
       console.log(this.login)
       this.$refs['login'].validate((valid) => {
         if (valid) {
-          ElNotification({
-            title: '提示',
-            message: '登录成功',
-            type: 'success',
+          register(this.login).then(res => {
+            console.log(res)
+            this.$successMsg('注册成功')
+          }).catch(err => {
+            console.log(err)
           })
         } else {
           return false;
