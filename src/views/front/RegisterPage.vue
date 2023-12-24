@@ -3,7 +3,7 @@
     <LoginNav />
     <div class="login-body">
       <div class="login-box">
-        <div class="login-title">登录</div>
+        <div class="login-title">注册</div>
         <div class="login-form">
           <el-form ref="login" :model="login" status-icon :rules="loginRule" label-width="0px"
             class="demo-ruleForm login-el-form">
@@ -15,8 +15,12 @@
               <span class="login-name-label" style="color: #afafaf">密码</span>
               <el-input class="login-input" v-model="login.login_pwd" type="password" autocomplete="off" />
             </el-form-item>
+            <el-form-item prop="login_repwd">
+              <span class="login-name-label" style="color: #afafaf">再次输入密码</span>
+              <el-input class="login-input" v-model="login.login_repwd" type="password" autocomplete="off" />
+            </el-form-item>
             <el-form-item>
-              <el-button @click="loginSubmit" class="login-btn">登录</el-button>
+              <el-button @click="loginSubmit" class="login-btn">注册</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -24,8 +28,8 @@
     </div>
     <div class="login-footer">
       <div class="login-footer-left">
-        <div>首次使用 Steam？</div>
-        <router-link class="login-link" to="/register">创建账户</router-link>
+        <div>已经有 Steam 管家账号？</div>
+        <router-link class="login-link" to="/login">去登录</router-link>
       </div>
       <div>创建帐户既免费又简单。探索成千上万款游戏，与数百万新朋友一起畅玩吧！ 了解更多关于 Steam 的信息</div>
     </div>
@@ -37,7 +41,7 @@ import { ElNotification } from 'element-plus'
 import LoginNav from '@/components/LoginNav.vue'
 
 export default {
-  name: "LoginPage",
+  name: "RegisterPage",
   components: {
     LoginNav
   },
@@ -56,6 +60,18 @@ export default {
           { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 6, max: 32, message: '用户名长度为6-32', trigger: 'blur' },
         ],
+        login_repwd: [
+          { required: true, message: '请再次输入密码', trigger: 'blur' },
+          {
+            validator: (rule, value, callback) => {
+              if (value !== this.login.login_pwd) {
+                callback(new Error('两次输入密码不一致'));
+              } else {
+                callback();
+              }
+            }
+          }
+        ],
       }
     };
   },
@@ -70,7 +86,6 @@ export default {
             type: 'success',
           })
         } else {
-          console.log('error submit!!');
           return false;
         }
       });
