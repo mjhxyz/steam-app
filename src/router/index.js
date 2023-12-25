@@ -2,9 +2,11 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import HelloWorld from '@/components/HelloWorld.vue'
 import LoginPage from '@/views/front/LoginPage'
 import RegisterPage from '@/views/front/RegisterPage'
+import HomePage from '@/views/front/HomePage'
 
 
 const routes = [
+    // 前端路由
     {
         path: '/',
         redirect: '/hello'
@@ -28,7 +30,14 @@ const routes = [
         path: '/register',
         name: 'register',
         component: RegisterPage
-    }
+    },
+    {
+        path: '/home',
+        name: 'home',
+        component: HomePage
+    },
+
+    // 后端路由
 ]
 
 const router = createRouter({
