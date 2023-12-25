@@ -2,26 +2,7 @@
     <div class="container">
         <LoginNav />
         <div class="container-body">
-            <div class="body-nav">
-                <div class="body-nav-cart">
-                    购物车
-                </div>
-                <div class="body-nav-bar">
-                    <div class="body-nav-avatar"></div>
-                    <div class="body-nav-opts">
-                        <div class="body-nav-opt">您的商店</div>
-                        <div class="body-nav-opt">推荐</div>
-                    </div>
-                    <div class="body-nav-search">
-                        <el-input style="height: 25px; border: none;" v-model="searchKey" placeholder="搜索"
-                            class="search-input">
-                            <template #append>
-                                <el-button @click="onSearch" :icon="Search" />
-                            </template>
-                        </el-input>
-                    </div>
-                </div>
-            </div>
+            <ToolBar />
             <div class="body-recommend">
                 <el-carousel indicator-position="outside" arrow="always" trigger="click">
                     <el-carousel-item v-for="cardList, i in gameCartList" :key="i">
@@ -61,11 +42,12 @@
 
 <script>
 import LoginNav from '@/components/LoginNav.vue'
-import { Search } from '@element-plus/icons-vue' // eslint-disable-line
+import ToolBar from '@/components/ToolBar.vue'
+import { Search } from '@element-plus/icons-vue'
 export default {
     name: "StoreHome",
     components: {
-        LoginNav,
+        LoginNav, ToolBar
     },
     data() {
         return {

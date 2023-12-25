@@ -3,6 +3,8 @@ import HelloWorld from '@/components/HelloWorld.vue'
 import LoginPage from '@/views/front/LoginPage'
 import RegisterPage from '@/views/front/RegisterPage'
 import HomePage from '@/views/front/HomePage'
+import SearchPage from '@/views/front/SearchPage'
+import LayOut from '@/components/front/LayOut'
 
 
 const routes = [
@@ -35,6 +37,17 @@ const routes = [
         path: '/home',
         name: 'home',
         component: HomePage
+    },
+    {
+        path: '/bar',
+        component: LayOut,
+        children: [
+            {
+                path: '/search',
+                name: 'search',
+                component: SearchPage
+            },
+        ]
     },
 
     // 后端路由
