@@ -28,7 +28,9 @@
                 <div class="game-purchase-action">
                     <div class="game-purchase-action-bg">
                         <div class="game-purchase-price">14,29￥</div>
-                        <div class="game-add-to-cart">加入购物车</div>
+                        <div class="game-add-to-cart" @click="onAddToCartClick">
+                            加入购物车
+                        </div>
                     </div>
                 </div>
             </div>
@@ -103,6 +105,16 @@ CS:GO 的所有物品均迁移至 CS2`,
         }
     },
     methods: {
+        onAddToCartClick() {
+            this.$message({
+                message: '加入购物车成功',
+                type: 'success'
+            });
+            // 跳转到购物车页面
+            this.$router.push({
+                path: '/cart'
+            })
+        },
         generateCommentList() {
             for (let i = 0; i < 5; i++) {
                 this.commentList.push({
@@ -129,6 +141,7 @@ CS:GO 的所有物品均迁移至 CS2`,
 /deep/ .el-rate {
     align-items: flex-start;
 }
+
 .detail-container {
     width: 100%;
     min-height: 100%;

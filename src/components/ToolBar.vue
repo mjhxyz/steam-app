@@ -1,13 +1,14 @@
 <template>
     <div class="body-nav">
-        <div class="body-nav-cart">
+        <div class="body-nav-cart" @click="$router.push('/cart')">
             购物车
         </div>
         <div class="body-nav-bar">
             <div class="body-nav-avatar"></div>
             <div class="body-nav-opts">
-                <div class="body-nav-opt">您的商店</div>
+                <div class="body-nav-opt">我的商店</div>
                 <div class="body-nav-opt">推荐</div>
+                <div class="body-nav-opt">我的游戏</div>
             </div>
             <div class="body-nav-search">
                 <el-input style="height: 25px; border: none;" v-model="searchKey" placeholder="搜索" class="search-input">
