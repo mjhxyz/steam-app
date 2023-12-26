@@ -4,6 +4,7 @@ import LoginPage from '@/views/front/LoginPage'
 import RegisterPage from '@/views/front/RegisterPage'
 import HomePage from '@/views/front/HomePage'
 import SearchPage from '@/views/front/SearchPage'
+import GameDetail from '@/views/front/GameDetail'
 import LayOut from '@/components/front/LayOut'
 
 
@@ -46,6 +47,11 @@ const routes = [
                 path: '/search',
                 name: 'search',
                 component: SearchPage
+            },
+            {
+                path: '/detail',
+                name: 'detail',
+                component: GameDetail
             },
         ]
     },

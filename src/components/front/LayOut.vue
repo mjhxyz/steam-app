@@ -43,6 +43,7 @@ export default {
     .container-center {
         width: 940px;
         margin: 0 auto;
+        min-height: 300px;
     }
 
     .nav-wrapper {

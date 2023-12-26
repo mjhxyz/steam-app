@@ -3,7 +3,7 @@
         <div class="search-key">所有产品</div>
         <div class="search-desc part">{{ gameList.length }} 个匹配的搜索结果。 </div>
         <div class="search-result">
-            <div class="search-result-row part" v-for="game in gameList" :key="game.id">
+            <div class="search-result-row part" v-for="game in gameList" :key="game.id" @click="onGameClick(game)">
                 <div class="search-result-image">
                     <img :src="game.logo" width="120" height="45" />
                 </div>
@@ -36,6 +36,14 @@ export default {
         }
     },
     methods: {
+        onGameClick(game) {
+            this.$router.push({
+                path: '/detail',
+                query: {
+                    id: game.id
+                }
+            })
+        },
         generateGameList() {
             for (let i = 0; i < 20; i++) {
                 this.gameList.push({
@@ -92,7 +100,7 @@ export default {
             transition: height 0.25s, margin 0.25s;
             margin-bottom: 5px;
             cursor: pointer;
-            background: rgba( 0, 0, 0, 0.2 );
+            background: rgba(0, 0, 0, 0.2);
 
             display: flex;
 
@@ -162,7 +170,7 @@ export default {
             font-family: "Motiva Sans", Sans-serif;
             font-weight: 300;
             border: 1px solid rgba(139, 185, 224, 0.2);
-            background: rgba( 0, 0, 0, 0.4 );
+            background: rgba(0, 0, 0, 0.4);
         }
     }
 
