@@ -9,12 +9,16 @@ import LayOut from '@/components/front/LayOut'
 import ShoppingCart from '@/views/front/ShoppingCart'
 import MyGame from '@/views/front/MyGame'
 
+import AdminLogin from '@/views/admin/AdminLogin'
+import AdminHome from '@/views/admin/AdminHome'
+import AdminUser from '@/views/admin/AdminUser'
+// import AdminLayOut from '@/views/admin/AdminLayOut'
 
 const routes = [
     // 前端路由
     {
         path: '/',
-        redirect: '/hello'
+        redirect: '/home'
     },
     {
         path: '/hello',
@@ -69,6 +73,24 @@ const routes = [
     },
 
     // 后端路由
+    {
+        path: '/admin/login',
+        name: 'adminlogin',
+        component: AdminLogin
+    },
+    {
+        path: '/admin',
+        name: 'adminlogin',
+        redirect: '/admin/user',
+        component: AdminHome,
+        children: [
+            {
+                path: '/admin/user',
+                name: 'adminuser',
+                component: AdminUser
+            }
+        ]
+    }
 ]
 
 const router = createRouter({

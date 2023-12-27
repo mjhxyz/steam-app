@@ -51,6 +51,11 @@ service.interceptors.response.use(
             // }
             return Promise.reject(new Error(res.msg || '出错了'))
         } else {
+            // ElMessage({
+            //     message: res.msg,
+            //     type: 'error',
+            //     duration: 5 * 1000
+            // })
             return res
         }
     },

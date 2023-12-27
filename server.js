@@ -102,9 +102,32 @@ const dispatcher = {
     '/': (req, res) => {
         res.statusCode = 200;
         res.end(JSON.stringify({ text: 'hello world' }));
+    },
+
+    /*************************** 后端管理 */
+    // 登录
+    '/admin/login': async (req, res) => {
+        res.statusCode = 200;
+        let userForm = await getJson(req);
+        let { login_name, login_pwd } = userForm;
+        // 判断用户名是否存在
+        let sql = 'select * from steam_user where login_name = ? and is_admin = 1';
+        let result = await mysqlQuery(sql, [login_name]);
+        if (result.length === 0) {
+            return error(1000, '用户名不存在');
+        }
+        // 判断密码是否正确
+        login_pwd = md5(login_pwd + login_name);
+        console.log(login_pwd);
+        let user = result[0];
+        if (user.login_pwd !== login_pwd) {
+            return error(1000, '密码错误');
+        }
+        // 登录成功
+        return ok(user);
     }
 
-    /*************************** 管理 */
+    // 注册
 }
 
 var onRequest = async function (req, res) {
