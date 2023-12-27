@@ -75,18 +75,18 @@ const routes = [
     // 后端路由
     {
         path: '/admin/login',
-        name: 'adminlogin',
+        name: 'adminLogin',
         component: AdminLogin
     },
     {
-        path: '/admin',
-        name: 'adminlogin',
+        path: '/admin/home',
+        name: 'adminHome',
         redirect: '/admin/user',
         component: AdminHome,
         children: [
             {
                 path: '/admin/user',
-                name: 'adminuser',
+                name: 'adminUser',
                 component: AdminUser
             }
         ]

@@ -7,4 +7,8 @@ function setAdminUser(user) {
     localStorage.setItem('admin-user', JSON.stringify(user));
 }
 
-export { getAdminUser, setAdminUser }
+function removeAdminUser() {
+    localStorage.removeItem('admin-user');
+}
+
+export { getAdminUser, setAdminUser, removeAdminUser}

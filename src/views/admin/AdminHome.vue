@@ -31,18 +31,15 @@
             <el-header style="text-align: right; font-size: 12px">
                 <div class="toolbar">
                     <el-dropdown>
-                        <el-icon style="margin-right: 8px; margin-top: 1px">
-                            <setting />
-                        </el-icon>
+                        <span>{{ user.login_name }}</span>
                         <template #dropdown>
                             <el-dropdown-menu>
-                                <el-dropdown-item>View</el-dropdown-item>
-                                <el-dropdown-item>Add</el-dropdown-item>
-                                <el-dropdown-item>退出登录</el-dropdown-item>
+                                <el-dropdown-item @click="logout">
+                                    退出登录
+                                </el-dropdown-item>
                             </el-dropdown-menu>
                         </template>
                     </el-dropdown>
-                    <span>Tom</span>
                 </div>
             </el-header>
 
@@ -61,26 +58,29 @@
 </template>
   
 <script>
-import { Menu as IconMenu, Message, Setting } from '@element-plus/icons-vue'
-
-const item = {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-}
-const tableData = Array.from({ length: 20 }).fill(item)
+import { Menu as IconMenu, Message } from '@element-plus/icons-vue'
+import { getAdminUser, removeAdminUser } from '@/utils/auth';
 
 export default {
     name: 'AdminHome',
     components: {
         IconMenu,
         Message,
-        Setting,
     },
-    setup() {
+    data() {
         return {
-            tableData,
+            user: {}
         }
+    },
+    methods: {
+        logout() {
+            removeAdminUser()
+            this.$router.push('/admin/login')
+        }
+    },
+    // 每次都要检查是否登录
+    created() {
+        this.user = getAdminUser()
     },
 }
 
