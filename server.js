@@ -105,6 +105,23 @@ const dispatcher = {
     },
 
     /*************************** 后端管理 */
+    // 删除用户
+    '/admin/delete_user': async (req, res) => {
+        res.statusCode = 200;
+        let userForm = await getJson(req);
+        console.log(userForm)
+        let { id } = userForm;
+        let sql = 'delete from steam_user where id = ? and is_admin=0';
+        let result = await mysqlQuery(sql, [id]);
+        return ok(result);
+    },
+    // 获取所有用户信息
+    '/admin/user_list': async (req, res) => {
+        res.statusCode = 200;
+        let sql = 'select * from steam_user where is_admin=0';
+        let result = await mysqlQuery(sql);
+        return ok(result);
+    },
     // 登录
     '/admin/login': async (req, res) => {
         res.statusCode = 200;
@@ -158,6 +175,13 @@ var onRequest = async function (req, res) {
         } catch (e) {
             console.error(e);
         }
+    } else {
+        let r = {
+            msg: "请求方法不存在",
+            code: 1001,
+        };
+        res.end(JSON.stringify(r));
+        return;
     }
     res.end(JSON.stringify(myObj));
 }

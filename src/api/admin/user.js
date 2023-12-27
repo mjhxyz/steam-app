@@ -8,6 +8,20 @@ export function login(data) {
     })
 }
 
+export function deleteUser(data) {
+    return request({
+        url: '/admin/delete_user',
+        method: 'post',
+        data
+    })
+}
+
+export function getUserList() {
+    return request({
+        url: '/admin/user_list',
+    })
+}
+
 export function getInfo(token) {
     return request({
         url: '/admin/info',

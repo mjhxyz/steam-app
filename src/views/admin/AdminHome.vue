@@ -20,7 +20,7 @@
                             <el-icon><icon-menu /></el-icon>用户管理
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="2-1">用户列表</el-menu-item>
+                            <el-menu-item index="/admin/user">用户列表</el-menu-item>
                         </el-menu-item-group>
                     </el-sub-menu>
                 </el-menu>
