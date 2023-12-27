@@ -11,7 +11,7 @@
                             </el-icon> 游戏管理
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="/admin/user">游戏列表</el-menu-item>
+                            <el-menu-item index="/admin/game">游戏列表</el-menu-item>
                             <el-menu-item index="1-2">游戏评论</el-menu-item>
                         </el-menu-item-group>
                     </el-sub-menu>

@@ -142,9 +142,32 @@ const dispatcher = {
         }
         // 登录成功
         return ok(user);
-    }
-
-    // 注册
+    },
+    // 游戏管理
+    '/admin/game_list': async (req, res) => {
+        res.statusCode = 200;
+        let sql = 'select * from steam_game';
+        let result = await mysqlQuery(sql);
+        return ok(result);
+    },
+    '/admin/delete_game': async (req, res) => {
+        res.statusCode = 200;
+        let gameForm = await getJson(req);
+        let { id } = gameForm;
+        let sql = 'delete from steam_game where id = ?';
+        let result = await mysqlQuery(sql, [id]);
+        return ok(result);
+    },
+    // 添加游戏
+    '/admin/add_game': async (req, res) => {
+        // 字段: name,logo,origin_price,final_price,short_desc,long_desc
+        res.statusCode = 200;
+        let gameForm = await getJson(req);
+        let { name, logo, origin_price, final_price, short_desc, long_desc, images} = gameForm;
+        let sql = 'insert into steam_game (name, logo, origin_price, final_price, short_desc, long_desc, images) values (?, ?, ?, ?, ?, ?, ?)';
+        let result = await mysqlInsert(sql, [name, logo, origin_price, final_price, short_desc, long_desc, images]);
+        return ok(result);
+    },
 }
 
 var onRequest = async function (req, res) {
