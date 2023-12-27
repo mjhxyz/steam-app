@@ -5,23 +5,25 @@
             <ToolBar />
             <div class="body-recommend">
                 <el-carousel indicator-position="outside" arrow="always" trigger="click">
-                    <el-carousel-item v-for="cardList, i in gameCartList" :key="i">
+                    <el-carousel-item v-for="cardList, i in gameCartList" :key="i" >
                         <div class="game-card-wrapper" style="width: 1200px;">
                             <div class="game-card" v-for="card, index in cardList" :key="index"
-                                :style="{ backgroundImage: 'url(' + card.imageUrl + ')' }">
+                                :style="{ backgroundImage: 'url(' + card.poster + ')' }" @click="onGameClick(card)">
                             </div>
                         </div>
                     </el-carousel-item>
                 </el-carousel>
             </div>
             <div class="body-game-list">
-                <div class="body-game-list-item" v-for="game in gameList" :key="game">
-                    <div class="body-game-review" :style="{ backgroundImage: 'url(' + game.imageUrl + ')' }"></div>
+                <div class="body-game-list-item" v-for="game in gameList" :key="game" @click="onGameClick(game)">
+                    <div class="body-game-review" :style="{ backgroundImage: 'url(' + game.poster + ')' }"></div>
                     <div class="body-game-label">
-                        <div class="discount-pct">-25%</div>
+                        <!-- 计算，保留整数 -->
+                        <div class="discount-pct">-{{ parseInt((game.origin_price - game.final_price) / game.origin_price *
+                            100) }}%</div>
                         <div class="discount-price">
-                            <div class="discount-original-price">￥ 59.00</div>
-                            <div class="discount-final-price">￥ 44.25</div>
+                            <div class="discount-original-price">￥ {{ game.origin_price }}</div>
+                            <div class="discount-final-price">￥ {{ game.final_price }}</div>
                         </div>
                     </div>
                 </div>
@@ -44,6 +46,7 @@
 import LoginNav from '@/components/LoginNav.vue'
 import ToolBar from '@/components/ToolBar.vue'
 import { Search } from '@element-plus/icons-vue'
+import { getPosterGameList } from '@/api/front/home';
 export default {
     name: "StoreHome",
     components: {
@@ -114,11 +117,28 @@ export default {
         };
     },
     methods: {
+        onGameClick(game) {
+            this.$router.push({ path: '/detail', query: { id: game.id } })
+        },
+        load() {
+            getPosterGameList().then(res => {
+                this.gameList = res.data
+                // 三个一组
+                this.gameCartList = []
+                for (let i = 0; i < this.gameList.length; i += 3) {
+                    this.gameCartList.push(this.gameList.slice(i, i + 3))
+                }
+                console.log(res)
+            }).catch(err => {
+                console.log(err)
+            })
+        },
         onSearch() {
             this.$errorMsg("暂未开放");
         }
     },
     mounted() {
+        this.load()
     }
 };
 

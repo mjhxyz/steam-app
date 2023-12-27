@@ -31,20 +31,20 @@
                 <div class="search-result-title mid"></div>
             </div>
         </div>
-        <div class="search-result-item" v-for="game in gameList" :key="game.id" @click="onGameClick(game)">
+        <div class="search-result-item" v-for="game in gameList" :key="game.id" @click="onGameClick(game.game)">
             <div class="search-result-item-logo">
-                <img :src="game.logo" alt="">
+                <img :src="game.game.logo" alt="">
             </div>
             <div class="search-result-item-info">
-                <div class="search-result-title mid">{{ game.name }}</div>
+                <div class="search-result-title mid">{{ game.game.name }}</div>
             </div>
             <div class="search-result-item-info">
-                <div class="search-result-time mid"> {{ game.create_time }}</div>
+                <div class="search-result-time mid"> {{ game.game.add_time }}</div>
             </div>
             <div class="search-result-item-info" style="flex: 1">
                 <div class="search-result-title mid" style="width: 100%;">
                     <!-- 评论按钮 防止点击到游戏详情 -->
-                    <el-button type="text" size="small" @click.stop="onCommentClick(game)">评论</el-button>
+                    <!-- <el-button type="text" size="small" @click.stop="onCommentClick(game)">评论</el-button> -->
                 </div>
             </div>
         </div>
@@ -52,6 +52,10 @@
 </template>
 
 <script>
+
+import { getMyGameList } from '@/api/front/my_game'
+import { getUser } from '@/utils/auth'
+
 
 export default {
     name: 'MyGame',
@@ -66,6 +70,19 @@ export default {
         }
     },
     methods: {
+        validLogin() {
+            if (!getUser()) {
+                this.$message({
+                    message: '请先登录',
+                    type: 'warning'
+                })
+                this.$router.push({
+                    path: '/login'
+                })
+                return false
+            }
+            return getUser()
+        },
         generateGameList() {
             for (let i = 0; i < 20; i++) {
                 this.gameList.push({
@@ -94,10 +111,24 @@ export default {
                 type: 'success'
             })
             console.log(game)
+        },
+        load() {
+            // 判断是否登录
+            const user = this.validLogin()
+            if (!user) {
+                return
+            }
+            getMyGameList(user.id).then(res => {
+                this.gameList = res.data
+                console.log(res)
+            }).catch(err => {
+                console.log(err)
+            })
         }
     },
     mounted() {
-        this.generateGameList()
+        // this.generateGameList()
+        this.load()
     }
 }
 

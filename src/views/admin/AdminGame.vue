@@ -11,6 +11,10 @@
                     <el-input v-model="form.logo" placeholder="请输入游戏logo">
                     </el-input>
                 </el-form-item>
+                <el-form-item label="游戏海报" prop="logo">
+                    <el-input v-model="form.poster" placeholder="请输入游戏海报">
+                    </el-input>
+                </el-form-item>
                 <el-form-item label="原始价格" prop="origin_price">
                     <el-input v-model="form.origin_price" placeholder="请输入原始价格">
                     </el-input>
@@ -51,6 +55,7 @@
                     <img :src="row.logo" alt="" style="width: 120px; height: 45px;">
                 </template>
             </el-table-column>
+            <el-table-column prop="poster" label="游戏海报" width="200"/>
             <el-table-column prop="origin_price" label="原始价格" width="200" />
             <el-table-column prop="final_price" label="当前价格" width="200" />
             <el-table-column prop="short_desc" label="游戏描述" width="200" />
@@ -85,6 +90,7 @@ export default {
                 origin_price: '',
                 final_price: '',
                 short_desc: '',
+                poster: '',
             },
         };
     },

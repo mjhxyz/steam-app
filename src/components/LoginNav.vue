@@ -6,20 +6,28 @@
         </div>
         <div class="login-opts">
             <router-link to="/home" class="login-opt">商店</router-link>
-            <router-link to="/about" class="login-opt">关于</router-link>
             <!-- 登录 -->
             <router-link v-if="!user.id" to="/login" class="login-opt">登录</router-link>
+            <!-- 退出 -->
+            <div v-if="user.id" class="login-opt" @click="logout">退出</div>
         </div>
     </div>
 </template>
 
 <script>
-import { getUser } from '@/utils/auth'
+import { getUser, removeUser } from '@/utils/auth'
 export default {
     name: "LoginNav",
     data() {
         return {
             user: {}
+        }
+    },
+    methods: {
+        logout() {
+            removeUser()
+            // 刷新页面
+            window.location.reload()
         }
     },
     created() {

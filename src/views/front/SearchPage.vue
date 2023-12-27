@@ -46,11 +46,17 @@ export default {
                 this.search(this.searchVal)
             },
         },
+        '$route.query': {
+            immediate: true, // 保证组件初始化时也会执行
+            deep: true, // 监听嵌套属性的变化
+            handler(newQuery) {
+                this.search(newQuery.key);
+            },
+        },
     },
     created() {
         // 获取搜索关键字
-        const key = this.$route.query.key
-        this.search(key)
+        this.search(this.$route.query);
     },
     methods: {
         search(key) {

@@ -23,3 +23,11 @@ export function getCartList(user_id) {
         data: { user_id }
     })
 }
+
+export function buyCart(user_id) {
+    return request({
+        url: '/cart/buy',
+        method: 'post',
+        data: { user_id }
+    })
+}

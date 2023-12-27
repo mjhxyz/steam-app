@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { getCartList, deleteCart } from '@/api/front/cart'
+import { getCartList, deleteCart, buyCart } from '@/api/front/cart'
 import { getUser } from '@/utils/auth'
 
 export default {
@@ -51,8 +51,7 @@ export default {
         }
     },
     methods: {
-        load() {
-            // 判断是否登录
+        validLogin() {
             if (!getUser()) {
                 this.$message({
                     message: '请先登录',
@@ -61,9 +60,16 @@ export default {
                 this.$router.push({
                     path: '/login'
                 })
+                return false
+            }
+            return getUser()
+        },
+        load() {
+            // 判断是否登录
+            const user = this.validLogin()
+            if (!user) {
                 return
             }
-            let user = getUser()
             getCartList(user.id).then(res => {
                 this.gameList = res.data
                 console.log(res)
@@ -79,12 +85,25 @@ export default {
                 })
                 return
             }
-            // this.$router.push({
-            //     path: '/buy',
-            //     query: {
-            //         id: this.gameList.map(game => game.id).join(',')
-            //     }
-            // })
+            // 判断是否登录
+            const user = this.validLogin()
+            if (!user) {
+                return
+            }
+            buyCart(user.id).then(res => {
+                this.$message({
+                    message: '购买成功',
+                    type: 'success'
+                })
+                this.load()
+                // 跳转到我的游戏
+                this.$router.push({
+                    path: '/my_game'
+                })
+                console.log(res)
+            }).catch(err => {
+                console.log(err)
+            })
         },
         onRemoveClick(id) {
             // this.gameList.splice(this.gameList.indexOf(game), 1)
