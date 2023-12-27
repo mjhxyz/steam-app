@@ -7,6 +7,7 @@ import SearchPage from '@/views/front/SearchPage'
 import GameDetail from '@/views/front/GameDetail'
 import LayOut from '@/components/front/LayOut'
 import ShoppingCart from '@/views/front/ShoppingCart'
+import MyGame from '@/views/front/MyGame'
 
 
 const routes = [
@@ -58,6 +59,11 @@ const routes = [
                 path: '/cart',
                 name: 'cart',
                 component: ShoppingCart
+            },
+            {
+                path: '/mygame',
+                name: 'mygame',
+                component: MyGame
             }
         ]
     },

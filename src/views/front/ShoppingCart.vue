@@ -17,12 +17,16 @@
                     <div class="cart-game-price-final">￥{{ game.final_price }}</div>
                 </div>
                 <div class="cart-game-opts">
-                    <el-button style="font-size: 12px;" type="text" size="small">移除</el-button>
+                    <el-button style="font-size: 12px;" type="text" size="small" @click="onRemoveClick(game)">
+                        移除
+                    </el-button>
                 </div>
             </div>
             <div class="cart-game-item">
                 <div class="cart-game-info">
-                    <el-button class="buy-button" type="primary" size="medium">购买</el-button>
+                    <el-button class="buy-button" type="primary" size="medium" @click="onBuyClick">
+                        <i class="el-icon-shopping-cart-2"></i>购买
+                    </el-button>
                 </div>
                 <div class="cart-game-price">
                     <div class="cart-game-price-final">￥{{ totalPrice }}</div>
@@ -45,8 +49,26 @@ export default {
         }
     },
     methods: {
+        onBuyClick() {
+            if (this.gameList.length === 0) {
+                this.$message({
+                    message: '购物车为空',
+                    type: 'warning'
+                })
+                return
+            }
+            // this.$router.push({
+            //     path: '/buy',
+            //     query: {
+            //         id: this.gameList.map(game => game.id).join(',')
+            //     }
+            // })
+        },
+        onRemoveClick(game) {
+            this.gameList.splice(this.gameList.indexOf(game), 1)
+        },
         generateGameList() {
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 5; i++) {
                 this.gameList.push({
                     id: i,
                     logo: 'https://cdn.akamai.steamstatic.com/steam/apps/730/capsule_sm_120_schinese.jpg?t=1698860631',
@@ -94,7 +116,6 @@ export default {
     background: -webkit-linear-gradient(bottom, rgba(121, 153, 5, 1) 5%, rgba(83, 105, 4, 1) 95%);
     background: linear-gradient(to top, rgba(121, 153, 5, 1) 5%, rgba(83, 105, 4, 1) 95%);
     transition: all 0.5s;
-
 }
 
 .shopping-cart {

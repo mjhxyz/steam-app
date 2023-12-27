@@ -6,9 +6,12 @@
         <div class="body-nav-bar">
             <div class="body-nav-avatar"></div>
             <div class="body-nav-opts">
-                <div class="body-nav-opt">我的商店</div>
-                <div class="body-nav-opt">推荐</div>
-                <div class="body-nav-opt">我的游戏</div>
+                <div class="body-nav-opt" @click="$router.push('/home')">
+                    商店
+                </div>
+                <div class="body-nav-opt" @click="$router.push('/mygame')">
+                    我的游戏
+                </div>
             </div>
             <div class="body-nav-search">
                 <el-input style="height: 25px; border: none;" v-model="searchKey" placeholder="搜索" class="search-input">
