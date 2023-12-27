@@ -18,7 +18,7 @@
                 </div>
                 <div class="game-label-value">
                     <div class="game-label">发行日期:</div>
-                    <div class="game-value">{{ game.create_time }}</div>
+                    <div class="game-value">{{ game.add_time }}</div>
                 </div>
             </div>
         </div>
@@ -69,50 +69,42 @@
 </template>
 
 <script>
+import { getGameDetail } from '@/api/front/game';
+import { addCart } from '@/api/front/cart';
+import { getUser } from '@/utils/auth';
+
 export default {
     name: 'GameDetail',
     data() {
         return {
             commentList: [],
             game: {
-                images: [
-                    'https://cdn.akamai.steamstatic.com/steam/apps/730/ss_0f8cf82d019c614760fd20801f2bb4001da7ea77.1920x1080.jpg?t=1698860631',
-                    'https://cdn.akamai.steamstatic.com/steam/apps/730/ss_0f8cf82d019c614760fd20801f2bb4001da7ea77.1920x1080.jpg?t=1698860631',
-                    'https://cdn.akamai.steamstatic.com/steam/apps/730/ss_0f8cf82d019c614760fd20801f2bb4001da7ea77.1920x1080.jpg?t=1698860631',
-                    'https://cdn.akamai.steamstatic.com/steam/apps/730/ss_0f8cf82d019c614760fd20801f2bb4001da7ea77.1920x1080.jpg?t=1698860631',
-                ],
-                name: 'Counter-Strike 2',
-                create_time: '2023/12/25',
-                origin_price: 59.99,
-                final_price: 53.99,
-                short_desc: '二十多年来，在全球数百万玩家的共同铸就下，Counter-Strike 提供了精湛绝伦的竞技体验。而如今，CS 传奇的下一章即将揭开序幕，那就是 Counter-Strike 2。',
-                long_desc: `二十多年来，在全球数百万玩家的共同铸就下，Counter-Strike 提供了精湛绝伦的竞技体验。而如今，CS 传奇的下一章即将揭开序幕，那就是 Counter-Strike 2。
-
-Counter-Strike 2 是 CS:GO 的免费升级版，展现了 Counter-Strike 历史上最大的技术飞跃。Counter-Strike 2 由 Source 2 引擎打造，具备基于物理的逼真渲染、最为先进的网络、经过升级的社区创意工坊工具，令人耳目一新。
-
-Counter Strike 系列于 1999 年开创了以完成目标为重的游戏玩法，而 Counter Strike 2 除了将这一经典元素保留，还会呈现以下特色：
-
-全新 CS 综合得分与经过更新的优先权模式
-全球及区域排行榜
-经过升级和大改的地图
-革命性的动态烟雾弹
-不受刷新频率阻碍的游戏体验
-全新设计的声画效果
-CS:GO 的所有物品均迁移至 CS2`,
-                tags: ['动作', '竞技', '射击', '多人', '第一人称射击', '暴力', '血腥', '多人竞技', 'FPS', '电子竞技', '竞技场', '战术', '战术射击', '第一人称', '第一人称射击', '多人', '射击', '暴力', '血腥', '多人竞技', 'FPS', '电子竞技', '竞技场', '战术', '战术射击', '第一人称', '第一人称射击', '多人', '射击', '暴力', '血腥', '多人竞技', 'FPS', '电子竞技', '竞技场', '战术', '战术射击', '第一人称', '第一人称射击', '多人', '射击', '暴力', '血腥', '多人竞技', 'FPS', '电子竞技', '竞技场', '战术', '战术射击', '第一人称', '第一人称射击', '多人', '射击', '暴力', '血腥', '多人竞技', 'FPS', '电子竞技', '竞技场', '战术', '战术射击', '第一人称', '第一人称射击', '多人', '射击', '暴力', '血腥', '多人竞技', 'FPS', '电子竞技', '竞技场', '战术', '战术射击', '第一人称', '第一人称射击', '多人', '射击', '暴力', '血腥', '多人竞技', 'FPS', '电子'],
-                logo: 'https://cdn.akamai.steamstatic.com/steam/apps/730/header_schinese.jpg?t=1698860631',
             }
         }
     },
     methods: {
         onAddToCartClick() {
-            this.$message({
-                message: '加入购物车成功',
-                type: 'success'
-            });
-            // 跳转到购物车页面
-            this.$router.push({
-                path: '/cart'
+            // 检查是否登录
+            if (!getUser()) {
+                this.$message({
+                    message: '请先去登录',
+                    type: 'warning'
+                });
+                return
+            }
+            let user = getUser()
+            addCart(user.id, this.game.id).then(res => {
+                console.log(res)
+                this.$message({
+                    message: '加入购物车成功',
+                    type: 'success'
+                });
+                // 跳转到购物车页面
+                this.$router.push({
+                    path: '/cart'
+                })
+            }).catch(err => {
+                console.log(err)
             })
         },
         generateCommentList() {
@@ -131,7 +123,18 @@ CS:GO 的所有物品均迁移至 CS2`,
         }
     },
     created() {
-        this.generateCommentList()
+        // this.generateCommentList()
+        // 获取 id
+        const id = this.$route.query.id
+        getGameDetail(id).then(res => {
+            let images = res.data.images
+            images = images.split(',')
+            res.data.images = images
+            this.game = res.data
+            console.log(this.game)
+        }).catch(err => {
+            console.log(err)
+        })
     }
 }
 

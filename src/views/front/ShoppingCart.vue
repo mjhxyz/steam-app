@@ -6,18 +6,18 @@
         <div class="cart-game-list">
             <div class="cart-game-item" v-for="game in gameList" :key="game.id">
                 <div class="cart-game-logo">
-                    <img :src="game.logo" alt="">
+                    <img :src="game.game.logo" alt="">
                 </div>
                 <div class="cart-game-info">
-                    <div class="cart-game-title">{{ game.name }}</div>
-                    <div class="cart-game-time">{{ game.create_time }}</div>
+                    <div class="cart-game-title">{{ game.game.name }}</div>
+                    <div class="cart-game-time">{{ game.game.create_time }}</div>
                 </div>
                 <div class="cart-game-price">
-                    <div class="cart-game-price-original">￥{{ game.origin_price }}</div>
-                    <div class="cart-game-price-final">￥{{ game.final_price }}</div>
+                    <div class="cart-game-price-original">￥{{ game.game.origin_price }}</div>
+                    <div class="cart-game-price-final">￥{{ game.game.final_price }}</div>
                 </div>
                 <div class="cart-game-opts">
-                    <el-button style="font-size: 12px;" type="text" size="small" @click="onRemoveClick(game)">
+                    <el-button style="font-size: 12px;" type="text" size="small" @click="onRemoveClick(game.id)">
                         移除
                     </el-button>
                 </div>
@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import { getCartList, deleteCart } from '@/api/front/cart'
+import { getUser } from '@/utils/auth'
 
 export default {
     name: 'ShoppingCart',
@@ -49,6 +51,26 @@ export default {
         }
     },
     methods: {
+        load() {
+            // 判断是否登录
+            if (!getUser()) {
+                this.$message({
+                    message: '请先登录',
+                    type: 'warning'
+                })
+                this.$router.push({
+                    path: '/login'
+                })
+                return
+            }
+            let user = getUser()
+            getCartList(user.id).then(res => {
+                this.gameList = res.data
+                console.log(res)
+            }).catch(err => {
+                console.log(err)
+            })
+        },
         onBuyClick() {
             if (this.gameList.length === 0) {
                 this.$message({
@@ -64,8 +86,18 @@ export default {
             //     }
             // })
         },
-        onRemoveClick(game) {
-            this.gameList.splice(this.gameList.indexOf(game), 1)
+        onRemoveClick(id) {
+            // this.gameList.splice(this.gameList.indexOf(game), 1)
+            deleteCart(id).then(res => {
+                this.$message({
+                    message: '删除成功',
+                    type: 'success'
+                })
+                this.load()
+                console.log(res)
+            }).catch(err => {
+                console.log(err)
+            })
         },
         generateGameList() {
             for (let i = 0; i < 5; i++) {
@@ -84,14 +116,15 @@ export default {
         totalPrice() {
             let total = 0
             for (let i = 0; i < this.gameList.length; i++) {
-                total += this.gameList[i].final_price
+                total += this.gameList[i].game.final_price
             }
             return total
         }
     },
 
     mounted() {
-        this.generateGameList()
+        // this.generateGameList()
+        this.load()
     }
 }
 </script>

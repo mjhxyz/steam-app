@@ -12,7 +12,7 @@
                         </template>
                         <el-menu-item-group>
                             <el-menu-item index="/admin/game">游戏列表</el-menu-item>
-                            <el-menu-item index="1-2">游戏评论</el-menu-item>
+                            <el-menu-item index="/admin/comment">游戏评论</el-menu-item>
                         </el-menu-item-group>
                     </el-sub-menu>
                     <el-sub-menu index="2">

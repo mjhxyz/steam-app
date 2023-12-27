@@ -8,7 +8,7 @@
                     <img :src="game.logo" width="120" height="45" />
                 </div>
                 <div class="search-result-title mid">{{ game.name }}</div>
-                <div class="search-result-time mid"> {{ game.create_time }}</div>
+                <div class="search-result-time mid"> {{ game.add_time }}</div>
                 <div class="search-result-price-pct mid">
                     <div class="search-result-price-pct-box">
                         <!-- 不保留小数 -->
@@ -26,16 +26,41 @@
 
 <script>
 
+import { searchGame } from '@/api/front/game'
+
 export default {
     name: 'SearchPage',
     components: {
     },
     data() {
         return {
-            gameList: []
+            gameList: [],
+            searchVal: this.$route.query.key,
         }
     },
+    watch: {
+        searchVal: {
+            immediate: true,
+            deep: true,
+            handler() {
+                this.search(this.searchVal)
+            },
+        },
+    },
+    created() {
+        // 获取搜索关键字
+        const key = this.$route.query.key
+        this.search(key)
+    },
     methods: {
+        search(key) {
+            searchGame(key).then(res => {
+                this.gameList = res.data
+                console.log(res)
+            }).catch(err => {
+                console.log(err)
+            })
+        },
         onGameClick(game) {
             this.$router.push({
                 path: '/detail',
@@ -44,21 +69,8 @@ export default {
                 }
             })
         },
-        generateGameList() {
-            for (let i = 0; i < 20; i++) {
-                this.gameList.push({
-                    id: i,
-                    logo: 'https://cdn.akamai.steamstatic.com/steam/apps/730/capsule_sm_120_schinese.jpg?t=1698860631',
-                    name: `Counter-Strike ${i}`,
-                    create_time: '2023/12/25',
-                    origin_price: 59.99,
-                    final_price: 53.99
-                })
-            }
-        }
     },
     mounted() {
-        this.generateGameList()
     }
 }
 </script>

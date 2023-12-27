@@ -76,12 +76,6 @@ async function getJson(req) {
 
 const dispatcher = {
     /*************************** 前端 */
-    '/user/login': async (req, res) => {
-        res.statusCode = 200;
-        let userForm = await getJson(req);
-        console.log(userForm);
-        return userForm;
-    },
     '/user/register': async (req, res) => {
         // 用户注册
         res.statusCode = 200;
@@ -102,6 +96,94 @@ const dispatcher = {
     '/': (req, res) => {
         res.statusCode = 200;
         res.end(JSON.stringify({ text: 'hello world' }));
+    },
+    // 搜索游戏
+    '/game/search': async (req, res) => {
+        res.statusCode = 200;
+        let gameForm = await getJson(req);
+        let { name } = gameForm;
+        console.log(gameForm)
+        let sql = `select * from steam_game where name like '%${name || ''}%'`;
+        console.log(sql)
+        let result = await mysqlQuery(sql, [`%${name}%`]);
+        return ok(result);
+    },
+    // 获取游戏详情
+    '/game/detail': async (req, res) => {
+        res.statusCode = 200;
+        let gameForm = await getJson(req);
+        let { id } = gameForm;
+        let sql = 'select * from steam_game where id = ? limit 1';
+        let result = await mysqlQuery(sql, [id]);
+        return ok(result && result[0]);
+    },
+    // 加入购物车
+    '/cart/add': async (req, res) => {
+        res.statusCode = 200;
+        let cartForm = await getJson(req);
+        let { user_id, game_id } = cartForm;
+        // 检查是否已经加入购物车
+        let sql = 'select * from steam_cart where user_id = ? and game_id = ?';
+        let result = await mysqlQuery(sql, [user_id, game_id]);
+        if (result.length > 0) {
+            return error(1000, '已经加入购物车');
+        }
+        sql = 'insert into steam_cart (user_id, game_id) values (?, ?)';
+        result = await mysqlInsert(sql, [user_id, game_id]);
+        return ok(result);
+    },
+    // 登录
+    '/user/login': async (req, res) => {
+        res.statusCode = 200;
+        let userForm = await getJson(req);
+        let { login_name, login_pwd } = userForm;
+        // 判断用户名是否存在
+        let sql = 'select * from steam_user where login_name = ?';
+        let result = await mysqlQuery(sql, [login_name]);
+        if (result.length === 0) {
+            return error(1000, '用户名不存在');
+        }
+        // 判断密码是否正确
+        login_pwd = md5(login_pwd + login_name);
+        console.log(login_pwd);
+        let user = result[0];
+        if (user.login_pwd !== login_pwd) {
+            return error(1000, '密码错误');
+        }
+        // 登录成功
+        return ok(user);
+    },
+    '/cart/list': async (req, res) => {
+        // 还要获取游戏信息
+        res.statusCode = 200;
+        let cartForm = await getJson(req);
+        let { user_id } = cartForm;
+        let sql = 'select * from steam_cart where user_id = ?';
+        let result = await mysqlQuery(sql, [user_id]);
+        if(result.length === 0) {
+            return ok([]);
+        }
+        console.log(result);
+        let gameIds = result.map(item => item.game_id);
+        sql = `select * from steam_game where id in (${gameIds.join(',')})`;
+        let gameList = await mysqlQuery(sql);
+        result = result.map(item => {
+            let game = gameList.find(game => game.id === item.game_id);
+            return {
+                ...item,
+                game
+            }
+        })
+        return ok(result);
+    },
+    // 删除购物车
+    '/cart/delete': async (req, res) => {
+        res.statusCode = 200;
+        let cartForm = await getJson(req);
+        let { id } = cartForm;
+        let sql = 'delete from steam_cart where id = ?';
+        let result = await mysqlQuery(sql, [id]);
+        return ok(result);
     },
 
     /*************************** 后端管理 */
@@ -163,9 +245,25 @@ const dispatcher = {
         // 字段: name,logo,origin_price,final_price,short_desc,long_desc
         res.statusCode = 200;
         let gameForm = await getJson(req);
-        let { name, logo, origin_price, final_price, short_desc, long_desc, images} = gameForm;
+        let { name, logo, origin_price, final_price, short_desc, long_desc, images } = gameForm;
         let sql = 'insert into steam_game (name, logo, origin_price, final_price, short_desc, long_desc, images) values (?, ?, ?, ?, ?, ?, ?)';
         let result = await mysqlInsert(sql, [name, logo, origin_price, final_price, short_desc, long_desc, images]);
+        return ok(result);
+    },
+    // 获取评论列表
+    '/admin/list_comment': async (req, res) => {
+        res.statusCode = 200;
+        let sql = 'select * from steam_comment';
+        let result = await mysqlQuery(sql);
+        return ok(result);
+    },
+    // 删除评论
+    '/admin/delete_comment': async (req, res) => {
+        res.statusCode = 200;
+        let commentForm = await getJson(req);
+        let { id } = commentForm;
+        let sql = 'delete from steam_comment where id = ?';
+        let result = await mysqlQuery(sql, [id]);
         return ok(result);
     },
 }

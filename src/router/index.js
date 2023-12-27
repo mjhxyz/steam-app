@@ -13,6 +13,7 @@ import AdminLogin from '@/views/admin/AdminLogin'
 import AdminHome from '@/views/admin/AdminHome'
 import AdminUser from '@/views/admin/AdminUser'
 import AdminGame from '@/views/admin/AdminGame'
+import AdminComment from '@/views/admin/AdminComment'
 // import AdminLayOut from '@/views/admin/AdminLayOut'
 
 const routes = [
@@ -94,6 +95,11 @@ const routes = [
                 path: '/admin/game',
                 name: 'adminGame',
                 component: AdminGame
+            },
+            {
+                path: '/admin/comment',
+                name: 'adminComment',
+                component: AdminComment
             }
         ]
     }

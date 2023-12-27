@@ -46,7 +46,11 @@
         <el-table :data="tableData" border style="width: 100%">
             <el-table-column prop="id" label="ID" width="100" />
             <el-table-column prop="name" label="游戏名称" width="200" />
-            <el-table-column prop="logo" label="游戏logo" width="200" />
+            <el-table-column prop="logo" label="游戏logo" width="200">
+                <template #default="{ row }">
+                    <img :src="row.logo" alt="" style="width: 120px; height: 45px;">
+                </template>
+            </el-table-column>
             <el-table-column prop="origin_price" label="原始价格" width="200" />
             <el-table-column prop="final_price" label="当前价格" width="200" />
             <el-table-column prop="short_desc" label="游戏描述" width="200" />

@@ -29,10 +29,12 @@ import { Search } from '@element-plus/icons-vue'
 
 export default {
     name: 'ToolBar',
+    // 让 router.push 的时候，即使已经是在 /search 页面，也能触发路由的变化
     data() {
         return {
             Search,
             searchKey: '',
+            searchVal: this.$route.query.key,
         }
     },
     methods: {
@@ -44,7 +46,7 @@ export default {
                 }
             })
         }
-    }
+    },
 }
 </script>
 

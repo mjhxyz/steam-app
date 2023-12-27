@@ -7,15 +7,24 @@
         <div class="login-opts">
             <router-link to="/home" class="login-opt">商店</router-link>
             <router-link to="/about" class="login-opt">关于</router-link>
+            <!-- 登录 -->
+            <router-link v-if="!user.id" to="/login" class="login-opt">登录</router-link>
         </div>
     </div>
 </template>
 
 <script>
+import { getUser } from '@/utils/auth'
 export default {
     name: "LoginNav",
     data() {
-    }
+        return {
+            user: {}
+        }
+    },
+    created() {
+        this.user = getUser() || {}
+    },
 }
 </script>
 

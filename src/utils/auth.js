@@ -11,4 +11,16 @@ function removeAdminUser() {
     localStorage.removeItem('admin-user');
 }
 
-export { getAdminUser, setAdminUser, removeAdminUser}
+function getUser() {
+    return JSON.parse(localStorage.getItem('user'));
+}
+
+function setUser(user) {
+    localStorage.setItem('user', JSON.stringify(user));
+}
+
+function removeUser() {
+    localStorage.removeItem('user');
+}
+
+export { getAdminUser, setAdminUser, removeAdminUser, getUser, setUser, removeUser };

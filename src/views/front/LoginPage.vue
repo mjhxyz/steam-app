@@ -35,6 +35,8 @@
 <script>
 import { ElNotification } from 'element-plus'
 import LoginNav from '@/components/LoginNav.vue'
+import { setUser } from '@/utils/auth';
+import { login } from '@/api/front/user';
 
 export default {
   name: "LoginPage",
@@ -64,10 +66,17 @@ export default {
       console.log(this.login)
       this.$refs['login'].validate((valid) => {
         if (valid) {
-          ElNotification({
-            title: '提示',
-            message: '登录成功',
-            type: 'success',
+          login(this.login).then(res => {
+            console.log(res)
+            setUser(res.data)
+            ElNotification({
+              title: '提示',
+              message: '登录成功',
+              type: 'success',
+            })
+            this.$router.push('/')
+          }).catch(err => {
+            console.log(err)
           })
         } else {
           console.log('error submit!!');
