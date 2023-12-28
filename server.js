@@ -321,6 +321,15 @@ const dispatcher = {
         let result = await mysqlQuery(sql, [id]);
         return ok(result);
     },
+    // 修改游戏
+    '/admin/update_game': async (req, res) => {
+        res.statusCode = 200;
+        let gameForm = await getJson(req);
+        let { id, poster, name, logo, origin_price, final_price, short_desc, long_desc, images } = gameForm;
+        let sql = 'update steam_game set name=?, logo=?, origin_price=?, final_price=?, short_desc=?, long_desc=?, images=?, poster=? where id = ?';
+        let result = await mysqlQuery(sql, [name, logo, origin_price, final_price, short_desc, long_desc, images, poster, id]);
+        return ok(result);
+    },
 }
 
 var onRequest = async function (req, res) {

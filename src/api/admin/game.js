@@ -20,3 +20,11 @@ export function addGame(data) {
         data
     })
 }
+
+export function updateGame(data) {
+    return request({
+        url: '/admin/update_game',
+        method: 'post',
+        data
+    })
+}
