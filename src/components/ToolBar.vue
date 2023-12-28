@@ -12,6 +12,9 @@
                 <div class="body-nav-opt" @click="$router.push('/mygame')">
                     我的游戏
                 </div>
+                <div class="body-nav-opt" @click="$router.push('/order')">
+                    我的订单
+                </div>
             </div>
             <div class="body-nav-search">
                 <el-input style="height: 25px; border: none;" v-model="searchKey" placeholder="搜索" class="search-input">

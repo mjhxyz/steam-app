@@ -1,18 +1,18 @@
 <template>
     <div class="my-game">
         <el-dialog v-model="commentVisible" title="评论游戏" width="900px">
-            <el-form :model="commentForm">
-                <el-form-item label="评分">
+            <el-form :model="comment" :rules="commentRules" ref="comment" label-width="100px">
+                <el-form-item label="评分" style="margin-bottom: 10px;" prop="rate">
                     <el-rate v-model="comment.rate" />
                 </el-form-item>
-                <el-form-item label="评价">
-                    <el-input v-model="comment.content" :rows="2" type="textarea" placeholder="请输入评价" />
+                <el-form-item label="评价" prop="content">
+                    <el-input v-model="comment.content" :rows="4" type="textarea" placeholder="请输入评价" />
                 </el-form-item>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="commentVisible = false">取消</el-button>
-                    <el-button type="primary" @click="commentVisible = false">
+                    <el-button type="primary" @click="commentSubmit">
                         提交
                     </el-button>
                 </span>
@@ -33,7 +33,7 @@
         </div>
         <div class="search-result-item" v-for="game in gameList" :key="game.id" @click="onGameClick(game.game)">
             <div class="search-result-item-logo">
-                <img :src="game.game.logo" alt="">
+                <img v-if="game" :src="game.game.logo" alt="">
             </div>
             <div class="search-result-item-info">
                 <div class="search-result-title mid">{{ game.game.name }}</div>
@@ -44,7 +44,7 @@
             <div class="search-result-item-info" style="flex: 1">
                 <div class="search-result-title mid" style="width: 100%;">
                     <!-- 评论按钮 防止点击到游戏详情 -->
-                    <!-- <el-button type="text" size="small" @click.stop="onCommentClick(game)">评论</el-button> -->
+                    <el-button type="text" size="small" @click.stop="onCommentClick(game.game)">评论</el-button>
                 </div>
             </div>
         </div>
@@ -55,21 +55,60 @@
 
 import { getMyGameList } from '@/api/front/my_game'
 import { getUser } from '@/utils/auth'
+import { addComment } from '@/api/admin/comment'
 
 
 export default {
     name: 'MyGame',
     data() {
         return {
+            commentRules: {
+                rate: [
+                    { required: true, message: '请选择评分', trigger: 'blur' },
+                ],
+                content: [
+                    { required: true, message: '请输入评价', trigger: 'blur' },
+                ],
+            },
             comment: {
                 content: '',
                 rate: 0,
             },
             commentVisible: false,
             gameList: [],
+            game: {},
         }
     },
     methods: {
+        commentSubmit() {
+            this.$refs['comment'].validate((valid) => {
+                if (valid) {
+                    // 提交评论
+                    addComment({
+                        user_id: getUser().id,
+                        game_id: this.game.id,
+                        content: this.comment.content,
+                        rate: this.comment.rate,
+                    }).then(res => {
+                        console.log(res)
+                        this.$message({
+                            message: '评论成功',
+                            type: 'success'
+                        })
+                        // 跳转到游戏详情
+                        this.$router.push({
+                            path: '/detail',
+                            query: {
+                                id: this.game.id
+                            }
+                        })
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                    this.commentVisible = false
+                }
+            })
+        },
         validLogin() {
             if (!getUser()) {
                 this.$message({
@@ -83,18 +122,6 @@ export default {
             }
             return getUser()
         },
-        generateGameList() {
-            for (let i = 0; i < 20; i++) {
-                this.gameList.push({
-                    id: i,
-                    logo: 'https://cdn.akamai.steamstatic.com/steam/apps/730/capsule_sm_120_schinese.jpg?t=1698860631',
-                    name: `Counter-Strike ${i}`,
-                    create_time: '2023/12/25',
-                    origin_price: 59.99,
-                    final_price: 53.99
-                })
-            }
-        },
         onGameClick(game) {
             this.$router.push({
                 path: '/detail',
@@ -105,12 +132,8 @@ export default {
         },
         onCommentClick(game) {
             // 直接弹出 el-dialog
+            this.game = game
             this.commentVisible = true
-            this.$message({
-                message: '评论',
-                type: 'success'
-            })
-            console.log(game)
         },
         load() {
             // 判断是否登录
@@ -120,6 +143,8 @@ export default {
             }
             getMyGameList(user.id).then(res => {
                 this.gameList = res.data
+                // 如果不存在 game 属性，则不展示一条
+                this.gameList = this.gameList.filter(item => item.game)
                 console.log(res)
             }).catch(err => {
                 console.log(err)

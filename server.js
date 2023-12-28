@@ -134,6 +134,12 @@ const dispatcher = {
         if (result.length > 0) {
             return error(1000, '该游戏已经购买');
         }
+        // 检查是否在订单中
+        sql = 'select * from steam_order_item where user_id = ? and game_id = ?';
+        result = await mysqlQuery(sql, [user_id, game_id]);
+        if (result.length > 0) {
+            return error(1000, '该游戏已经在订单中');
+        }
         sql = 'insert into steam_cart (user_id, game_id) values (?, ?)';
         result = await mysqlInsert(sql, [user_id, game_id]);
         return ok(result);
@@ -308,8 +314,28 @@ const dispatcher = {
     // 获取评论列表
     '/admin/list_comment': async (req, res) => {
         res.statusCode = 200;
+        // 还要获取到游戏信息 和用户信息
         let sql = 'select * from steam_comment';
         let result = await mysqlQuery(sql);
+        if (result.length === 0) {
+            return ok([]);
+        }
+        let userIds = result.map(item => item.user_id);
+        let gameIds = result.map(item => item.game_id);
+        sql = `select * from steam_user where id in (${userIds.join(',')})`;
+        let userList = await mysqlQuery(sql);
+        sql = `select * from steam_game where id in (${gameIds.join(',')})`;
+        let gameList = await mysqlQuery(sql);
+        result = result.map(item => {
+            let user = userList.find(user => user.id === item.user_id);
+            let game = gameList.find(game => game.id === item.game_id);
+            return {
+                ...item,
+                user,
+                game
+            }
+        }
+        )
         return ok(result);
     },
     // 删除评论
@@ -330,6 +356,148 @@ const dispatcher = {
         let result = await mysqlQuery(sql, [name, logo, origin_price, final_price, short_desc, long_desc, images, poster, id]);
         return ok(result);
     },
+    // 评价游戏
+    '/admin/add_comment': async (req, res) => {
+        res.statusCode = 200;
+        let commentForm = await getJson(req);
+        let { user_id, game_id, content, rate } = commentForm;
+        let sql = 'insert into steam_comment (user_id, game_id, content, rate) values (?, ?, ?, ?)';
+        let result = await mysqlInsert(sql, [user_id, game_id, content, rate]);
+        return ok(result);
+    },
+    // 获取评论列表
+    '/admin/list_comment_by_game_id': async (req, res) => {
+        res.statusCode = 200;
+        let commentForm = await getJson(req);
+        let { game_id } = commentForm;
+        // 同时要获取到用户信息
+        let sql = 'select * from steam_comment where game_id = ?';
+        let result = await mysqlQuery(sql, [game_id]);
+        if (result.length === 0) {
+            return ok([]);
+        }
+        let userIds = result.map(item => item.user_id);
+        sql = `select * from steam_user where id in (${userIds.join(',')})`;
+        let userList = await mysqlQuery(sql);
+        result = result.map(item => {
+            let user = userList.find(user => user.id === item.user_id);
+            return {
+                ...item,
+                user
+            }
+        })
+        return ok(result);
+    },
+    // 下订单 提供 支付方式，和备忘
+    '/order/add': async (req, res) => {
+        res.statusCode = 200;
+        let orderForm = await getJson(req);
+        // 下单逻辑:
+        // 1. 前端提供参数: 支付方式, 备注
+        // 2. 获取购物车列表
+        // 3. 计算总价 写入到订单表
+        // 4. 写入到订单详情表, 每一个订单详情对应一个购物车
+        // 5. 清空购物车
+        // 6. 返回订单id
+        let { user_id, payment_type, remark } = orderForm;
+        // 获取购物车列表
+        let sql = 'select * from steam_cart where user_id = ?';
+        let result = await mysqlQuery(sql, [user_id]);
+        if (result.length === 0) {
+            return error(1000, '购物车为空');
+        }
+        // let gameIds = result.map(item => item.game_id);
+        let gameIds = [];
+        result.forEach(item => {
+            gameIds.push(item.game_id);
+        })
+        sql = `select * from steam_game where id in (${gameIds.join(',')})`;
+        let gameList = await mysqlQuery(sql);
+        let total = 0;
+
+        // result 没有 map 函数!!!! 不能这样用 result.map
+        let tmp = [];
+        result.forEach(item => {
+            let game = gameList.find(game => game.id === item.game_id);
+            total += game.final_price;
+            tmp.push({
+                ...item,
+                game
+            })
+        })
+        result = tmp;
+        console.log(result)
+        // 写入订单表
+        sql = 'insert into steam_order (user_id, payment_type, remark, total) values (?, ?, ?, ?)';
+        let t = await mysqlInsert(sql, [user_id, payment_type, remark, total]);
+        console.log(result)
+        let order_id = t.insertId;
+        // 写入订单详情表, 需要有 游戏id, 游戏价格
+        sql = `insert into steam_order_item (order_id, game_id, price, user_id) values ${result.map(item => `(${order_id}, ${item.game_id}, ${item.game.final_price}, ${user_id})`).join(',')}`;
+        await mysqlQuery(sql);
+        // 清空购物车
+        sql = 'delete from steam_cart where user_id = ?';
+        await mysqlQuery(sql, [user_id]);
+        return ok(order_id);
+    },
+    // 获取订单列表
+    '/order/list': async (req, res) => {
+        res.statusCode = 200;
+        let orderForm = await getJson(req);
+        let { user_id } = orderForm;
+        let sql = 'select * from steam_order where user_id = ?';
+        let result = await mysqlQuery(sql, [user_id]);
+        if (result.length === 0) {
+            return ok([]);
+        }
+        let orderIds = result.map(item => item.id);
+        sql = `select * from steam_order_item where order_id in (${orderIds.join(',')})`;
+        let orderItemList = await mysqlQuery(sql);
+        let gameIds = orderItemList.map(item => item.game_id);
+        sql = `select * from steam_game where id in (${gameIds.join(',')})`;
+        let gameList = await mysqlQuery(sql);
+        result = result.map(item => {
+            let orderItems = orderItemList.filter(orderItem => orderItem.order_id === item.id);
+            orderItems = orderItems.map(orderItem => {
+                let game = gameList.find(game => game.id === orderItem.game_id);
+                return {
+                    ...orderItem,
+                    game
+                }
+            })
+            return {
+                ...item,
+                orderItems
+            }
+        })
+        return ok(result);
+    },
+    // 删除订单, 订单详情也要删除
+    '/order/delete': async (req, res) => {
+        res.statusCode = 200;
+        let orderForm = await getJson(req);
+        let { id } = orderForm;
+        let sql = 'delete from steam_order where id = ?';
+        let result = await mysqlQuery(sql, [id]);
+        sql = 'delete from steam_order_item where order_id = ?';
+        await mysqlQuery(sql, [id]);
+        return ok(result);
+    },
+    // 完成订单
+    '/order/finish': async (req, res) => {
+        res.statusCode = 200;
+        let orderForm = await getJson(req);
+        let { id } = orderForm;
+        let sql = 'update steam_order set status = "已完成" where id = ?';
+        let result = await mysqlQuery(sql, [id]);
+        // 将订单详情中的游戏添加到我的游戏中
+        sql = 'select * from steam_order_item where order_id = ?';
+        let orderItemList = await mysqlQuery(sql, [id]);
+        let gameIds = orderItemList.map(item => item.game_id);
+        sql = `insert into steam_my_game (user_id, game_id) values ${gameIds.map(game_id => `(${orderItemList[0].user_id}, ${game_id})`).join(',')}`;
+        await mysqlQuery(sql);
+        return ok(result);
+    }
 }
 
 var onRequest = async function (req, res) {

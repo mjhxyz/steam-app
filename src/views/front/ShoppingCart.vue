@@ -1,5 +1,56 @@
 <template>
     <div class="shopping-cart">
+        <!-- 订单生成 model -->
+        <!-- 风格保持一样 -->
+        <el-dialog title="订单生成" v-model="dialogVisible" width="30%" :before-close="handleClose"
+            :close-on-click-modal="false" style="overflow: hidden; border-radius: 5px;">
+            <el-form :model="orderForm" :rules="orderRule" ref="order" label-width="100px" class="demo-ruleForm">
+                <!-- 支付方式 -->
+                <el-form-item label="支付方式" prop="payment_type">
+                    <el-radio-group v-model="orderForm.payment_type">
+                        <el-radio label="1">微信支付</el-radio>
+                        <el-radio label="2">支付宝支付</el-radio>
+                        <el-radio label="3">赊账</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="备注" prop="remark">
+                    <el-input v-model="orderForm.remark"></el-input>
+                </el-form-item>
+            </el-form>
+            <!-- 展示包含的游戏 还要包含总价 -->
+            <div class="cart-game-list">
+                <div class="cart-game-item" v-for="game in gameList" :key="game.id">
+                    <div class="cart-game-logo">
+                        <img :src="game.game.logo" alt="">
+                    </div>
+                    <div class="cart-game-info">
+                        <div class="cart-game-title">{{ game.game.name }}</div>
+                        <div class="cart-game-time">{{ game.game.create_time }}</div>
+                    </div>
+                    <div class="cart-game-price">
+                        <div class="cart-game-price-original">￥{{ game.game.origin_price }}</div>
+                        <div class="cart-game-price-final">￥{{ game.game.final_price }}</div>
+                    </div>
+                </div>
+                <div class="cart-game-item">
+                    <div class="cart-game-info">
+                        <div class="cart-game-title">总价</div>
+                    </div>
+                    <div class="cart-game-price">
+                        <div class="cart-game-price-final">￥{{ totalPrice }}</div>
+                    </div>
+                </div>
+            </div>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="dialogVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="orderSubmit">
+                        提交
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
         <div class="shopping-title">
             您的购物车 ({{ gameList.length }})
         </div>
@@ -40,14 +91,26 @@
 </template>
 
 <script>
-import { getCartList, deleteCart, buyCart } from '@/api/front/cart'
+import { getCartList, deleteCart } from '@/api/front/cart'
+// import { getCartList, deleteCart, buyCart } from '@/api/front/cart'
 import { getUser } from '@/utils/auth'
+import { addOrder } from '@/api/front/order'
 
 export default {
     name: 'ShoppingCart',
     data() {
         return {
+            orderRule: {
+                payment_type: [
+                    { required: true, message: '请选择支付方式', trigger: 'blur' },
+                ],
+            },
+            dialogVisible: false,
             gameList: [],
+            orderForm: {
+                payment_type: '1',
+                remark: ''
+            }
         }
     },
     methods: {
@@ -63,6 +126,35 @@ export default {
                 return false
             }
             return getUser()
+        },
+        orderSubmit() {
+            this.$refs['order'].validate((valid) => {
+                // user_id, payment_type, remark
+                if (valid) {
+                    // 提交订单
+                    addOrder({
+                        user_id: getUser().id,
+                        payment_type: this.orderForm.payment_type,
+                        remark: this.orderForm.remark,
+                    }).then(res => {
+                        this.$message({
+                            message: '购买成功',
+                            type: 'success'
+                        })
+                        this.dialogVisible = false
+                        this.load()
+                        // 跳转到我的游戏
+                        this.$router.push({
+                            path: '/mygame'
+                        })
+                        console.log(res)
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                    return true
+                }
+                return false
+            });
         },
         load() {
             // 判断是否登录
@@ -85,25 +177,26 @@ export default {
                 })
                 return
             }
+            this.dialogVisible = true
             // 判断是否登录
-            const user = this.validLogin()
-            if (!user) {
-                return
-            }
-            buyCart(user.id).then(res => {
-                this.$message({
-                    message: '购买成功',
-                    type: 'success'
-                })
-                this.load()
-                // 跳转到我的游戏
-                this.$router.push({
-                    path: '/my_game'
-                })
-                console.log(res)
-            }).catch(err => {
-                console.log(err)
-            })
+            // const user = this.validLogin()
+            // if (!user) {
+            //     return
+            // }
+            // buyCart(user.id).then(res => {
+            //     this.$message({
+            //         message: '购买成功',
+            //         type: 'success'
+            //     })
+            //     this.load()
+            //     // 跳转到我的游戏
+            //     this.$router.push({
+            //         path: '/mygame'
+            //     })
+            //     console.log(res)
+            // }).catch(err => {
+            //     console.log(err)
+            // })
         },
         onRemoveClick(id) {
             // this.gameList.splice(this.gameList.indexOf(game), 1)

@@ -11,7 +11,7 @@
                     <el-input v-model="form.logo" placeholder="请输入游戏logo" :disabled="action === 'detail'">
                     </el-input>
                 </el-form-item>
-                <el-form-item label="游戏海报" prop="logo">
+                <el-form-item label="游戏海报" prop="poster">
                     <el-input v-model="form.poster" placeholder="请输入游戏海报" :disabled="action === 'detail'">
                     </el-input>
                 </el-form-item>
@@ -23,23 +23,24 @@
                     <el-input v-model="form.final_price" placeholder="请输入当前价格" :disabled="action === 'detail'">
                     </el-input>
                 </el-form-item>
-                <el-form-item label="游戏截图" prop="short_desc">
-                    <el-input type="textarea" :rows="5" v-model="form.images" placeholder="请输入游戏截图地址逗号分割" :disabled="action === 'detail'">
+                <el-form-item label="游戏截图" prop="images">
+                    <el-input type="textarea" :rows="5" v-model="form.images" placeholder="请输入游戏截图地址逗号分割"
+                        :disabled="action === 'detail'">
                     </el-input>
                 </el-form-item>
                 <el-form-item label="游戏描述" prop="short_desc">
                     <el-input v-model="form.short_desc" placeholder="请输入游戏描述" :disabled="action === 'detail'">
                     </el-input>
                 </el-form-item>
-                <el-form-item label="游戏长描述" prop="short_desc">
-                    <el-input v-model="form.long_desc" type="textarea" :rows="5" placeholder="请输入游戏长描述" :disabled="action === 'detail'">
+                <el-form-item label="游戏长描述" prop="long_desc">
+                    <el-input v-model="form.long_desc" type="textarea" :rows="5" placeholder="请输入游戏长描述"
+                        :disabled="action === 'detail'">
                     </el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="showAddGameDialog = false">取 消</el-button>
-                <el-button type="primary" @click="doAction" v-show="action !== 'detail'"
-                >确 定</el-button>
+                <el-button type="primary" @click="doAction" v-show="action !== 'detail'">确 定</el-button>
             </template>
         </el-dialog>
         <!-- 操作按钮 -->
@@ -56,12 +57,23 @@
                     <img :src="row.logo" alt="" style="width: 120px; height: 45px;">
                 </template>
             </el-table-column>
-            <el-table-column prop="poster" label="游戏海报" width="200" />
+            <el-table-column prop="poster" label="游戏海报" width="100">
+                <template #default="{ row }">
+                    <!-- 点击后再新窗口打开查看 -->
+                    <a :href="row.poster" target="_blank" style="display: flex; justify-content: center;" v-if="row.poster">
+                        <img :src="row.poster" alt="" style="width: 45px; height: 45px;">
+                    </a>
+                </template>
+            </el-table-column>
             <el-table-column prop="origin_price" label="原始价格" width="200" />
             <el-table-column prop="final_price" label="当前价格" width="200" />
-            <el-table-column prop="short_desc" label="游戏描述" width="200" />
+            <!-- 游戏描述 超过 20 个字显示省略号 -->
+            <el-table-column prop="short_desc" label="游戏描述" width="">
+                <template #default="{ row }">
+                    <span>{{ row.short_desc.length > 20 ? row.short_desc.substring(0, 20) + '...' : row.short_desc }}</span>
+                </template>
+            </el-table-column>
             <el-table-column prop="add_time" label="添加时间" width="200" />
-            <el-table-column prop="update_time" label="修改时间" width="200" />
             <!-- 操作按钮 -->
             <el-table-column prop="opt" label="操作" width="260">
                 <template #default="{ row }">
@@ -186,6 +198,7 @@ export default {
                 short_desc: '',
             }
             this.formTitle = '添加游戏'
+            this.action = 'add'
             this.showAddGameDialog = true
         },
         handleDelete(id) {

@@ -13,6 +13,14 @@ export function getCommentList() {
     })
 }
 
+export function getCommentListByGameId(data) {
+    return request({
+        url: '/admin/list_comment_by_game_id',
+        method: 'post',
+        data
+    })
+}
+
 export function addComment(data) {
     return request({
         url: '/admin/add_comment',

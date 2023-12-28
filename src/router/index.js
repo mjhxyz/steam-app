@@ -8,6 +8,7 @@ import GameDetail from '@/views/front/GameDetail'
 import LayOut from '@/components/front/LayOut'
 import ShoppingCart from '@/views/front/ShoppingCart'
 import MyGame from '@/views/front/MyGame'
+import OrderPage from '@/views/front/OrderPage'
 
 import AdminLogin from '@/views/admin/AdminLogin'
 import AdminHome from '@/views/admin/AdminHome'
@@ -70,6 +71,11 @@ const routes = [
                 path: '/mygame',
                 name: 'mygame',
                 component: MyGame
+            },
+            {
+                path: '/order',
+                name: 'order',
+                component: OrderPage
             }
         ]
     },

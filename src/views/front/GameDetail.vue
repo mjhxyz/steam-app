@@ -1,6 +1,6 @@
 <template>
     <div class="detail-container">
-        <div class="game-title">Counter-Strike 2</div>
+        <div class="game-title">{{ game.name }}</div>
         <div class="game-detail">
             <div class="game-images">
                 <el-carousel :interval="5000" arrow="always" height="400px">
@@ -48,17 +48,18 @@
                     <div class="game-comment-item" v-for="comment in commentList" :key="comment.id">
                         <div class="comment-user">
                             <div class="comment-user-avator">
-                                <img :src="comment.user.avatar" width="34" height="34" />
+                                <img :src="'https://api.multiavatar.com/' + comment.user_id + '1.png'" width="34"
+                                    height="34" />
                             </div>
                             <div class="comment-user-name">
-                                {{ comment.user.name }}
+                                {{ comment.user.name || '无名氏' }}
                             </div>
                         </div>
                         <div class="comment-body">
                             <div class="comment-stars">
-                                <el-rate style="justify-content: start;" v-model="comment.stars" disabled></el-rate>
+                                <el-rate style="justify-content: start;" v-model="comment.rate" disabled></el-rate>
                             </div>
-                            <div class="comment-time">发布于：{{ comment.time }}</div>
+                            <div class="comment-time">发布于：{{ comment.add_time }}</div>
                             <div class="comment-conent"> {{ comment.content }} </div>
                         </div>
                     </div>
@@ -72,6 +73,7 @@
 import { getGameDetail } from '@/api/front/game';
 import { addCart } from '@/api/front/cart';
 import { getUser } from '@/utils/auth';
+import { getCommentListByGameId } from '@/api/front/comment';
 
 export default {
     name: 'GameDetail',
@@ -107,23 +109,8 @@ export default {
                 console.log(err)
             })
         },
-        generateCommentList() {
-            for (let i = 0; i < 5; i++) {
-                this.commentList.push({
-                    id: i,
-                    user: {
-                        name: '毛师傅' + i,
-                        avatar: 'https://steamcdn-a',
-                    },
-                    stars: 5,
-                    time: '2021/12/25',
-                    content: '这个游戏 666 ！',
-                })
-            }
-        }
     },
     created() {
-        // this.generateCommentList()
         // 获取 id
         const id = this.$route.query.id
         getGameDetail(id).then(res => {
@@ -132,6 +119,13 @@ export default {
             res.data.images = images
             this.game = res.data
             console.log(this.game)
+        }).catch(err => {
+            console.log(err)
+        })
+        // 获取评论
+        getCommentListByGameId({ game_id: id }).then(res => {
+            this.commentList = res.data
+            console.log(res)
         }).catch(err => {
             console.log(err)
         })
@@ -257,7 +251,7 @@ export default {
                     color: #8091a2;
                     display: inline-block;
                     opacity: 0.6;
-                    width: 100px;
+                    width: 200px;
                 }
 
                 .comment-conent {
