@@ -1,5 +1,5 @@
 <template>
-    <div style="padding: 10px;">
+    <div style="padding: 20px;">
         <!-- 添加游戏的对话框 -->
         <el-dialog :title="formTitle" v-model="showAddGameDialog" width="900px">
             <el-form :model="form" :rules="formRules" ref="addGame" label-width="100px">
@@ -50,7 +50,7 @@
             </el-button>
         </div>
         <el-table :data="tableData" border style="width: 100%">
-            <el-table-column prop="id" label="ID" width="100" />
+            <el-table-column prop="id" label="ID" width="100" align="center" />
             <el-table-column prop="name" label="游戏名称" width="200" />
             <el-table-column prop="logo" label="游戏logo" width="200">
                 <template #default="{ row }">

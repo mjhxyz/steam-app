@@ -1,6 +1,6 @@
 
 <template>
-    <div style="padding: 10px;">
+    <div style="padding: 20px;">
         <!-- 操作按钮 -->
         <el-table :data="tableData" border style="width: 100%">
             <el-table-column prop="id" label="ID" width="100" />

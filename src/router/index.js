@@ -95,17 +95,20 @@ const routes = [
             {
                 path: '/admin/user',
                 name: 'adminUser',
-                component: AdminUser
+                component: AdminUser,
+                meta: { title: '用户列表' }
             },
             {
                 path: '/admin/game',
                 name: 'adminGame',
-                component: AdminGame
+                component: AdminGame,
+                meta: { title: '游戏列表' }
             },
             {
                 path: '/admin/comment',
                 name: 'adminComment',
-                component: AdminComment
+                component: AdminComment,
+                meta: { title: '评论列表' }
             }
         ]
     }

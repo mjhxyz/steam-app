@@ -1,9 +1,9 @@
 <template>
-    <div>
-        <el-table :data="tableData">
+    <div class="container">
+        <el-table :data="tableData" border style="width: 100%">
             <el-table-column prop="id" label="ID" width="100" />
             <el-table-column prop="login_name" label="登录名" width="200" />
-            <el-table-column prop="nick_name" label="用户昵称" width="200" />
+            <el-table-column prop="nick_name" label="用户昵称" width="" />
             <el-table-column prop="add_time" label="注册时间" width="200" />
             <el-table-column prop="update_time" label="修改时间" width="200" />
             <!-- 操作按钮 -->
@@ -59,4 +59,10 @@ export default {
 
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+
+.container {
+    padding: 20px;
+}
+
+</style>
