@@ -15,6 +15,7 @@ import AdminHome from '@/views/admin/AdminHome'
 import AdminUser from '@/views/admin/AdminUser'
 import AdminGame from '@/views/admin/AdminGame'
 import AdminComment from '@/views/admin/AdminComment'
+import AdminMain from '@/views/admin/AdminMain'
 // import AdminLayOut from '@/views/admin/AdminLayOut'
 
 const routes = [
@@ -92,6 +93,12 @@ const routes = [
         redirect: '/admin/user',
         component: AdminHome,
         children: [
+            {
+                path: '/admin/main',
+                name: 'adminMain',
+                component: AdminMain,
+                meta: { title: '首页' }
+            },
             {
                 path: '/admin/user',
                 name: 'adminUser',

@@ -8,7 +8,12 @@
                 </div>
                 <el-menu :default-active="this.$router.path" router background-color="#304156" text-color="#fff"
                     :collapse="false" active-text-color="#409BFF">
-                    <el-sub-menu index="1">
+                    <!-- 不用子菜单 -->
+                    <el-menu-item style="background-color: #304156 !important;" index="/admin/main">
+                        <el-icon><HomeFilled/></el-icon>首页
+                    </el-menu-item>
+
+                    <el-sub-menu index="2">
                         <template #title>
                             <el-icon>
                                 <message />
@@ -17,7 +22,7 @@
                         <el-menu-item index="/admin/game">游戏列表</el-menu-item>
                         <el-menu-item index="/admin/comment">游戏评论</el-menu-item>
                     </el-sub-menu>
-                    <el-sub-menu index="2">
+                    <el-sub-menu index="3">
                         <template #title>
                             <el-icon><icon-menu /></el-icon>用户管理
                         </template>
@@ -31,8 +36,7 @@
             <el-header
                 style="text-align: right; font-size: 12px; background-color: #fff;box-shadow: 0 1px 4px rgba(0,21,41,.08);">
                 <div class="toolbar">
-                    <div style="color: #000; justify-self: flex-start; font-size: 20px;"
-                    >{{ $route.meta.title }}</div>
+                    <div style="color: #000; justify-self: flex-start; font-size: 20px;">{{ $route.meta.title }}</div>
                     <el-dropdown class="toolbar-item">
                         <span class="toolbar-item-inner">{{ user.login_name }}</span>
                         <template #dropdown>
@@ -61,7 +65,7 @@
 </template>
   
 <script>
-import { Menu as IconMenu, Message } from '@element-plus/icons-vue'
+import { Menu as IconMenu, Message, HomeFilled } from '@element-plus/icons-vue'
 import { getAdminUser, removeAdminUser } from '@/utils/auth';
 
 export default {
@@ -69,6 +73,7 @@ export default {
     components: {
         IconMenu,
         Message,
+        HomeFilled
     },
     data() {
         return {

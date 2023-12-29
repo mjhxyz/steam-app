@@ -497,7 +497,64 @@ const dispatcher = {
         sql = `insert into steam_my_game (user_id, game_id) values ${gameIds.map(game_id => `(${orderItemList[0].user_id}, ${game_id})`).join(',')}`;
         await mysqlQuery(sql);
         return ok(result);
-    }
+    },
+    // 获取当日新增订单数量，购买游戏数量，新增用户数量
+    '/admin/stat': async (req, res) => {
+        res.statusCode = 200;
+        let sql = 'select count(*) as count from steam_order where date(add_time) = date(now())';
+        let result = await mysqlQuery(sql);
+        let orderCount = result[0].count;
+        sql = 'select count(*) as count from steam_my_game where date(add_time) = date(now())';
+        result = await mysqlQuery(sql);
+        let myGameCount = result[0].count;
+        sql = 'select count(*) as count from steam_user where date(add_time) = date(now())';
+        result = await mysqlQuery(sql);
+        let userCount = result[0].count;
+        return ok({
+            orderCount,
+            myGameCount,
+            userCount
+        });
+    },
+    // 获取总订单数量，购买游戏数量，用户数量
+    '/admin/total_stat': async (req, res) => {
+        res.statusCode = 200;
+        let sql = 'select count(*) as count from steam_order';
+        let result = await mysqlQuery(sql);
+        let orderCount = result[0].count;
+        sql = 'select count(*) as count from steam_my_game';
+        result = await mysqlQuery(sql);
+        let myGameCount = result[0].count;
+        sql = 'select count(*) as count from steam_user';
+        result = await mysqlQuery(sql);
+        let userCount = result[0].count;
+        return ok({
+            orderCount,
+            myGameCount,
+            userCount
+        });
+    },
+    // 按照天统计 新增订单数量，新增购买游戏数量，新增用户数量, 获取数据后，返回 echarts 中的折线图图表配置 options
+    '/admin/stat_by_day': async (req, res) => {
+        res.statusCode = 200;
+        let sql = 'select count(*) as count, date(add_time) as date from steam_order group by date(add_time)';
+        let result = await mysqlQuery(sql);
+        let orderCount = result.map(item => item.count);
+        let date = result.map(item => item.date);
+        sql = 'select count(*) as count, date(add_time) as date from steam_my_game group by date(add_time)';
+        result = await mysqlQuery(sql);
+        let myGameCount = result.map(item => item.count);
+        sql = 'select count(*) as count, date(add_time) as date from steam_user group by date(add_time)';
+        result = await mysqlQuery(sql);
+        let userCount = result.map(item => item.count);
+        date = date.map(item => item.toLocaleDateString());
+        return ok({
+            orderCount,
+            myGameCount,
+            userCount,
+            date
+        });
+    },
 }
 
 var onRequest = async function (req, res) {
